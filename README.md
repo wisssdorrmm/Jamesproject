@@ -1,49 +1,39 @@
 # Schoolhouse
 
-A simple school management system.
+A school management system: Node.js + Express, SQLite via libSQL (local file or Turso), JWT auth, plain HTML/CSS/JS frontend.
 
-- **Owner**: sees all students, teachers and assignments. Can remove accounts and assignments.
-- **Teacher**: signs up, posts assignments, sees all students.
-- **Student**: signs up, sees all assignments.
+## Features
 
-Stack: Node.js, Express, SQLite (better-sqlite3), JWT auth, plain HTML/CSS/JS frontend. No external services needed.
+- **Owner / admin panel**: stats, create accounts, change anyone's role (including making owners), reset passwords, disable/remove accounts, search and filter people, school-wide announcements.
+- **Teachers**: create classes (join codes), post assignments, read submissions, grade with feedback, class announcements.
+- **Students**: join classes by code, submit work, see grades and feedback.
+- Everyone: edit profile name, change password.
 
-## Run it
+## Run locally
 
-Requires Node.js 18 or newer.
+Requires Node.js 18+.
 
 ```bash
 npm install
-cp .env.example .env     # on Windows: copy .env.example .env
+cp .env.example .env
 npm start
 ```
 
-Open http://localhost:3000
+Open http://localhost:3000. With `TURSO_DATABASE_URL` blank, data is stored in `data/school.db`.
 
-## Owner login
+## Owner accounts
 
-The owner account is created on first start from `OWNER_EMAIL` and `OWNER_PASSWORD` in `.env`
-(defaults: `owner@school.local` / `ChangeMe123!`). Change these before using it for real.
-To re-seed the owner, stop the server, delete the `data/` folder, and start again (this wipes all data).
+Emails in `OWNER_EMAILS` become owner when they sign up (or on next start if the account exists).
+Other owners are made from the **People** page. The app always keeps one active owner.
 
-Teachers and students sign up from the app. Nobody can sign up as owner.
+## Deploy on Vercel
 
-## API
+1. Create a free database at https://turso.tech (Dashboard > Create Database). Copy its URL (`libsql://...`) and create a token (read & write).
+2. Push this project to GitHub and import it in Vercel.
+3. In Vercel > Project > Settings > Environment Variables add:
+   - `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`
+   - `JWT_SECRET` (any long random string)
+   - `OWNER_EMAILS` (e.g. `wisdomudoudo24@gmail.com`)
+4. Redeploy (Deployments > ... > Redeploy), then open the site and sign up with an owner email before sharing the link.
 
-| Method | Path | Who |
-|---|---|---|
-| POST | /api/auth/signup | public (teacher or student) |
-| POST | /api/auth/login | public |
-| GET | /api/me | any logged-in user |
-| GET | /api/students | owner, teacher |
-| GET | /api/teachers | owner |
-| GET | /api/stats | owner |
-| DELETE | /api/users/:id | owner |
-| GET | /api/assignments | any logged-in user |
-| POST | /api/assignments | teacher |
-| PUT | /api/assignments/:id | the teacher who created it |
-| DELETE | /api/assignments/:id | creating teacher, or owner |
-
-## Deploying
-
-Set `PORT`, `OWNER_*` and `JWT_SECRET` as environment variables on your host. The SQLite file lives in `data/`, so use a host with a persistent disk (Render, Railway, Fly.io, a VPS).
+`api/index.js` is the serverless entry point and `vercel.json` routes `/api/*` to it; `public/` is served as static files.

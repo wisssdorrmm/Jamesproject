@@ -1,7 +1,7 @@
 {
   "name": "school-management",
-  "version": "1.0.0",
-  "description": "Simple school management system: owner, teachers, students, assignments",
+  "version": "2.0.0",
+  "description": "School management system: owner, teachers, students, classes, assignments, grading",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,10 +12,11 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@libsql/client": "^0.14.0",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.5.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.2"
   }
 }
